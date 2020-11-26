@@ -1,0 +1,47 @@
+version: '3'
+services:
+  app:
+    command: flask run --host 0.0.0.0 --port 5000
+    build:
+      ./web
+    ports:
+      - 5000:5000
+    depends_on:
+      - auth
+    environment:
+      FLASK_ENV: development
+  auth:
+    build: ./auth/
+#    restart: always
+    environment:
+      FLASK_ENV: development
+      DATABASE_URL: postgresql+psycopg2://testusr:password@db:5432/testdb
+      PASSWORD_SALT: ^CPe?g2&GQ
+      SECRET_KEY: bH?UuPg5#9E%S?q2pD25!$EE84_Qq%DU
+      CLIENT_ORIGIN: http://app:5000
+    command: >
+      sh -c "flask db stamp head &&
+             flask db upgrade &&
+             flask run --host 0.0.0.0 --port 5050"
+    ports:
+      - 5050:5050
+    depends_on:
+      - db
+      - cache
+  db:
+    image: postgres:12.0-alpine
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    ports:
+    - 5432:5432
+    env_file:
+      - ./.env
+  cache:
+    image: memcached
+    ports:
+      - 11211:11211
+    entrypoint:
+      - memcached
+      - -m 64
+volumes:
+  postgres_data:

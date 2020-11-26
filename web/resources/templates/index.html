@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block head %}
+<title>Home</title>
+{% endblock %}
+
+{% block body %}
+    <form action="{{ url_for('home') }}" method="post">
+        <div class="form-group">
+            {{ form.text.label }}
+            <div class="form-control">{{ form.text }}</div>
+            <br>
+        </div>
+        <input type="submit" value="Сохранить"/>
+        <input type="button" onclick="window.location.href='{{ url_for("logout") }}';" value="Выйти"/>
+    </form>
+{% endblock %}
